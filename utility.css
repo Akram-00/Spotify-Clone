@@ -1,0 +1,71 @@
+.border{
+    border: 2px solid red;
+}
+
+.filter-invert{
+    filter: invert(1);
+}
+
+.flex{
+    display: flex;
+}
+
+.items-center{
+    align-items: center;
+}
+.justify-center{
+    justify-content: center;
+}
+
+.justify-between{
+    justify-content: space-between;
+}
+
+.invert{
+    filter: invert(1);
+}
+
+.bg-grey{
+    background-color:#121212;
+    color:white;
+}
+
+.bg-grey-2{
+    background-color: #1e1e1e;
+    color: white;
+}
+
+.bg-black{
+    background-color: #000000;
+    color: white;
+}
+
+.mirror{
+    transform: rotate(180deg);
+}
+
+.rounded{
+    border-radius: 7px;
+}
+
+.rounded-top{
+    border-radius:7px 7px 0 0;
+}
+
+.rounded-bottom{
+    border-radius: 0 0 7px 7px;
+}
+
+.m-1{
+    margin:5px;
+}
+
+.p-1{
+    padding: 10px;
+}
+
+
+
+
+
+

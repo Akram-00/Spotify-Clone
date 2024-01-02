@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotify – Web Player</title>
+    <link
+      rel="shortcut icon"
+      href="https://open.spotifycdn.com/cdn/images/favicon32.b64ecc03.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="utility.css" />
+  </head>
+
+  <body>
+    <div class="container flex bg-black">
+      <div class="left">
+        <div class="home rounded bg-grey p-1">
+          <div class="logo">
+            <img src="logo.svg" class="logo-img" alt="logo" />
+            <img src="close-menu.svg" class="close-menu" alt="close" />
+          </div>
+          <ul>
+            <li><img class="invert" src="home.svg" alt="home" />Home</li>
+            <li><img class="invert" src="search.svg" alt="search" />Search</li>
+          </ul>
+        </div>
+        <div class="library bg-grey rounded p-1">
+          <div class="heading items-center">
+            <img src="library.svg" alt="" class="invert" />
+            <h2>Your library</h2>
+          </div>
+          <div class="songlist">
+            <ol></ol>
+            <div class="footer">
+              <div>
+                <a href="https://www.spotify.com/us/legal/">
+                  <span>Legal</span>
+                </a>
+              </div>
+              <div>
+                <a href="https://www.spotify.com/us/privacy/">
+                  <span>Privacy Center</span>
+                </a>
+              </div>
+              <div>
+                <a href="https://www.spotify.com/us/legal/privacy-policy/">
+                  <span>Privacy Policy</span>
+                </a>
+              </div>
+              <div>
+                <a href="https://www.spotify.com/us/legal/cookies-policy/">
+                  <span>Cookies</span>
+                </a>
+              </div>
+              <div>
+                <a href="https://www.spotify.com/us/legal/privacy-policy/#s3">
+                  <span>About Ads</span>
+                </a>
+              </div>
+
+              <div>
+                <a href="https://www.spotify.com/us/accessibility/">
+                  <span>Accessibility</span>
+                </a>
+              </div>
+              <div>
+                <a href="https://www.spotify.com/us/accessibility/">
+                  <span>Cookies Setting</span>
+                </a>
+              </div>
+              <div>
+                <a href="https://www.spotify.com/us/accessibility/">
+                  <span>Notice at Collection</span>
+                </a>
+              </div>
+              <div>
+                <a href="https://www.spotify.com/us/accessibility/">
+                  <span>Cookies</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="right bg-grey rounded">
+        <div class="header flex justify-between rounded-top">
+          <div class="nav">
+            <img src="left-arrow.svg" alt="" class="arrow" />
+            <img src="right-arrow.svg" alt="" class="arrow" />
+            <img src="hamburger-menu.svg" class="invert hamburger" alt="" />
+          </div>
+          <div class="buttons">
+            <button class="button sign-up-btn">Sign up</button>
+            <button class="button login-btn">Log in</button>
+          </div>
+        </div>
+        <div id="spotifyPlaylist">
+          <h1 class="p-1">Spotify Playlists</h1>
+          <div class="card-container">
+            <div class="card rounded">
+              <img
+                class="thumbnail rounded"
+                src="https://i.scdn.co/image/ab67706f00000002403f8ff596413f3d280026df"
+                alt=""
+              />
+              <h3>New Year's Eve 2023</h3>
+              <img src="green-play-btn.svg" alt="" class="green-play-btn" />
+              <p>Ring in 2024 with your favorite party tracks!</p>
+            </div>
+            <div class="card rounded">
+              <img
+                class="thumbnail rounded"
+                src="https://i.scdn.co/image/ab67706f00000002403f8ff596413f3d280026df"
+                alt=""
+              />
+              <h3>New Year's Eve 2023</h3>
+              <img src="green-play-btn.svg" alt="" class="green-play-btn" />
+              <p>Ring in 2024 with your favorite party tracks!</p>
+            </div>
+          </div>
+          <div class="playbar">
+            <div class="seekbar">
+              <div class="circle"></div>
+              <div class="over-seekbar"></div>
+            </div>
+            <div class="aboveBar">
+              <div class="song-info">Otha Ommala - Narendra Modi</div>
+              <div class="songbuttons flex justify-center">
+                <img
+                  class="previous mirror"
+                  src="previous-song.svg"
+                  alt="previous-song"
+                />
+                <img
+                  class="play-pause"
+                  src="play-song.svg"
+                  alt="play-pause-song"
+                />
+                <img class="next" src="next-song.svg" alt="next-song" />
+              </div>
+              <div class="song-time">0:00 / 0:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Include the 'bytes' library from CDN -->
+    <script src="script.js"></script>
+  </body>
+</html>
