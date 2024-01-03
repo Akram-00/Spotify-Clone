@@ -332,6 +332,10 @@
   justify-content: space-between;
 }
 
+.song-info{
+  width: 240px;
+}
+
 .song-info,
 .song-time {
   color: black;
