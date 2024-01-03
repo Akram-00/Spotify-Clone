@@ -37,7 +37,8 @@ async function getSongs() {
   return songs;
 }
 
-let currentAudio = null;
+const song_0_link = `http://127.0.0.1:5500/songs/Abroad%20Again%20-%20Jeremy%20Blake.mp3`;
+currentAudio = new Audio(song_0_link);
 let isPlaying = false;
 let statusImg = null;
 
@@ -103,7 +104,7 @@ const playCurrentMusic = (audio) => {
             document.querySelector(".circle").style.left = `${percent}%`;
           });
       } else {
-        document.querySelector("playbar .song-info").innerHTML =""
+        document.querySelector("playbar .song-info").innerHTML = "";
         document.querySelector(".playbar .song-time").innerHTML = "0:00 / 0:00";
       }
     });
@@ -136,7 +137,6 @@ const main = async () => {
   Array.from(document.querySelectorAll(".songlist ol li")).forEach((e) => {
     e.addEventListener("click", () => {
       const link = e.getAttribute("songLink");
-      const songName = e.querySelector(".song-name").textContent;
       const audio = new Audio(link);
       playCurrentMusic(audio);
       renderPlayPauseButton(link);
@@ -145,25 +145,30 @@ const main = async () => {
 
   document.querySelector(".songbuttons").addEventListener("click", (event) => {
     const eventClass = event.target.classList;
+
     if (eventClass.contains("previous")) {
+      const currentSong = songs.find((song) => song.link === currentAudio.src);
+      const index = songs.indexOf(currentSong);
+      const previousIndex = index === 0 ? songs.length - 1 : index - 1;
+      const nextSong = new Audio(songs[previousIndex].link);
+      playCurrentMusic(nextSong);
     } else if (eventClass.contains("play-pause")) {
-      if (currentAudio === null) {
-        const song_0_link = `http://127.0.0.1:5500/songs/Abroad%20Again%20-%20Jeremy%20Blake.mp3`;
-        const audio = new Audio(song_0_link);
-        currentAudio = audio;
-      }
       playCurrentMusic(currentAudio);
     } else if (eventClass.contains("next")) {
+      const currentSong = songs.find((song) => song.link === currentAudio.src);
+      const index = songs.indexOf(currentSong);
+      const nextIndex = index < songs.length ? index + 1 : 0;
+      const nextSong = new Audio(songs[nextIndex].link);
+      playCurrentMusic(nextSong);
     }
   });
 
-  document.querySelector(".hamburger").addEventListener('click',()=>{
-    document.querySelector('.left').style.left = '0';
-  })
-  document.querySelector(".close-menu").addEventListener('click',()=>{
-    document.querySelector('.left').style.left = '-100%';
-  })
-
+  document.querySelector(".hamburger").addEventListener("click", () => {
+    document.querySelector(".left").style.left = "0";
+  });
+  document.querySelector(".close-menu").addEventListener("click", () => {
+    document.querySelector(".left").style.left = "-100%";
+  });
 };
 
 main();
