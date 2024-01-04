@@ -125,30 +125,28 @@
   padding: 0 10px;
   margin-top: 30px;
   max-height: 71vh;
-  overflow: hidden;
+  overflow: scroll;
   transition: overflow 0.3s ease;
   height: fit-content;
 }
 
+.card-container::-webkit-scrollbar {
+  display: none;
+}
+
+/*
 .card-container:hover {
   overflow-y: scroll;
-  /* Show the scrollbar on hover */
 }
 
-.card-container::-webkit-scrollbar {
-  width: 12px;
-  /* Set the width of the scrollbar */
-}
 
-.card-container::-webkit-scrollbar-thumb {
+ .card-container::-webkit-scrollbar-thumb {
   background-color: rgba(128, 128, 128, 0.596);
-  /* Set the color of the scrollbar thumb */
 }
 
 .card-container::-webkit-scrollbar-track {
   background-color: #181818;
-  /* Set the color of the scrollbar track */
-}
+} */
 
 .card {
   width: 200px;
@@ -338,10 +336,25 @@
 }
 
 .song-info,
-.song-time {
+.song-time,
+.song-volume {
   color: black;
   padding: 12px;
 }
+
+.song-volume{
+  cursor: pointer;
+}
+
+.aboveBar .song-time-volume{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* .song-time-volume .song-volume:hover::before{
+  content: "Adadaf";
+} */
 
 @media (max-width: 745px) {
   .left {
