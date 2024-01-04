@@ -65,7 +65,7 @@ const renderPlayPauseButton = (songLink) => {
   });
 };
 
-const playCurrentMusic = (audio) => {
+const playCurrentMusic = async(audio) => {
   if (currentAudio) {
     if (currentAudio.src === audio.src) {
       currentAudio.pause();
@@ -83,18 +83,26 @@ const playCurrentMusic = (audio) => {
     currentAudio = audio;
     isPlaying = true;
 
+    const songList = await getSongs();
+
+    const songObj = songList.find((song) => song.link === currentAudio.src);
+    
+    document.querySelector('.playbar .song-info').innerHTML = !!songObj ? `${songObj.title} - ${songObj.artist}` : `Song Name - Aritist Name`;
+
     currentAudio.addEventListener("timeupdate", () => {
       if (currentAudio && currentAudio.currentTime && currentAudio.duration) {
         const duration = `${formatDuration(
           currentAudio.currentTime
         )} / ${formatDuration(currentAudio.duration)}`;
-        document.querySelector(".playbar .song-time").innerHTML = duration;
+        document.querySelector(".playbar .song-time-volume .song-time").innerHTML = duration;
         document.querySelector(".playbar .seekbar .circle").style.left = `${
           (currentAudio.currentTime / currentAudio.duration) * 100
         }%`;
+        
         document.querySelector(".over-seekbar").style.width = `${
           (currentAudio.currentTime / currentAudio.duration) * 100
         }%`;
+
         document
           .querySelector(".playbar .seekbar")
           .addEventListener("click", (e) => {
@@ -103,9 +111,9 @@ const playCurrentMusic = (audio) => {
             currentAudio.currentTime = (currentAudio.duration * percent) / 100;
             document.querySelector(".circle").style.left = `${percent}%`;
           });
+
       } else {
-        document.querySelector("playbar .song-info").innerHTML = "";
-        document.querySelector(".playbar .song-time").innerHTML = "0:00 / 0:00";
+        document.querySelector(".playbar .song-time-volume .song-time").innerHTML = "0:00 / 0:00";
       }
     });
   }
@@ -166,6 +174,7 @@ const main = async () => {
   document.querySelector(".hamburger").addEventListener("click", () => {
     document.querySelector(".left").style.left = "0";
   });
+
   document.querySelector(".close-menu").addEventListener("click", () => {
     document.querySelector(".left").style.left = "-100%";
   });

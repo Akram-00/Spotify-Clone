@@ -228,28 +228,29 @@
 .songlist ol {
   padding: 0 20px;
   max-height: 35vh;
-  overflow: hidden;
+  overflow: scroll;
 }
 
+.songlist ol::-webkit-scrollbar{
+  display: none;
+}
+
+/* 
 .songlist ol:hover {
   overflow-y: scroll;
-  /* Show the scrollbar on hover */
 }
 
 .songlist ol::-webkit-scrollbar {
   width: 12px;
-  /* Set the width of the scrollbar */
 }
 
 .songlist ol::-webkit-scrollbar-thumb {
   background-color: rgba(128, 128, 128, 0.596);
-  /* Set the color of the scrollbar thumb */
 }
 
 .songlist ol::-webkit-scrollbar-track {
   background-color: #181818;
-  /* Set the color of the scrollbar track */
-}
+} */
 
 .songlist ol li {
   display: flex;
@@ -343,14 +344,12 @@
 }
 
 @media (max-width: 745px) {
-  .container {
-    overscroll-behavior-block: none;
-  }
   .left {
-    background-color: black;
+    background-color: #121212;
     position: absolute;
     left: -130%;
     transition: all 0.3s;
+    padding:0;
     z-index: 1;
     width: max-content;
     height: 100vh;
@@ -359,6 +358,10 @@
 
   .songlist ol li {
     gap: 10px;
+  }
+
+  .songlist ol li .info div{
+    word-break: break-all;
   }
 
   .card-container {
@@ -372,10 +375,6 @@
     margin-bottom: 50px;
   }
 
-  .card-container:hover,
-  .songlist ol:hover {
-    overflow-y: scroll;
-  }
 
   .playbar {
     width: 90%;
