@@ -7,6 +7,11 @@
   font-family: "Roboto", sans-serif;
 }
 
+:root{
+  --a:0;
+  --bottom:24px;
+}
+
 .body {
   background-color: black;
   color: white;
@@ -172,20 +177,21 @@
 
 .card:hover {
   background-color: #242424;
+  --a:1;
+  --bottom:85px
 }
 
 .green-play-btn {
-  /* bottom: 86px;
-    opacity: 1; */
-  bottom: 24px;
+  bottom: var(--bottom);
   right: 17px;
   position: absolute;
-  width: 25%;
+  width: 20%;
   background: #1fdf64;
   border-radius: 30px;
   padding: 13px;
-  opacity: 0;
-  transition: all 1s ease-out;
+  opacity: var(--a);
+  cursor: pointer;
+  transition: all 0.9s;
 }
 
 .buttons > * {
@@ -229,7 +235,7 @@
   overflow: scroll;
 }
 
-.songlist ol::-webkit-scrollbar{
+.songlist ol::-webkit-scrollbar {
   display: none;
 }
 
@@ -329,9 +335,12 @@
 .aboveBar {
   display: flex;
   justify-content: space-between;
+  height: 100%;
+  align-items: center;
+  text-align: center;
 }
 
-.song-info{
+.song-info {
   width: 240px;
 }
 
@@ -339,30 +348,35 @@
 .song-time,
 .song-volume {
   color: black;
-  padding: 12px;
+  /* padding: 12px; */
 }
 
-.song-volume{
-  cursor: pointer;
-}
-
-.aboveBar .song-time-volume{
+.aboveBar .song-time-volume {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 300px;
+  gap: 12px;
+}
+.aboveBar .song-time-volume .song-volume {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
 }
 
 /* .song-time-volume .song-volume:hover::before{
   content: "Adadaf";
 } */
 
-@media (max-width: 745px) {
+@media (max-width: 768px) {
   .left {
     background-color: #121212;
     position: absolute;
     left: -130%;
     transition: all 0.3s;
-    padding:0;
+    padding: 0;
     z-index: 1;
     width: max-content;
     height: 100vh;
@@ -373,7 +387,7 @@
     gap: 10px;
   }
 
-  .songlist ol li .info div{
+  .songlist ol li .info div {
     word-break: break-all;
   }
 
@@ -386,14 +400,15 @@
 
   .card {
     margin-bottom: 50px;
+    width: calc(100vw - 40%);
+    height: fit-content;
   }
-
 
   .playbar {
     width: 90%;
     height: 9rem;
   }
-  .aboveBar{
+  .aboveBar {
     flex-direction: column;
     align-items: center;
   }
@@ -401,10 +416,6 @@
     width: 95%;
   }
 
-  .card {
-    width: calc(100vw - 40%);
-    height: fit-content;
-  }
 
   .close-menu {
     display: block;
@@ -419,5 +430,9 @@
   }
   .arrow {
     display: none;
+  }
+  .aboveBar .song-time-volume {
+    flex-direction: column;
+    gap: 10px;
   }
 }

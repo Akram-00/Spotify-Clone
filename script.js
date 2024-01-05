@@ -8,14 +8,13 @@ function formatDuration(seconds) {
   return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
 }
 
-async function getSongs() {
+async function getSongs(folder) {
   const songs = [];
-
-  let musics = await fetch("http://127.0.0.1:5500/songs/");
+  let musics = !!folder ? await fetch(`http://127.0.0.1:5500/songs/${folder}`) : await fetch("http://127.0.0.1:5500/songs/");
   let response = await musics.text();
   let div = document.createElement("DIV");
   div.innerHTML = response;
-  let a = div.querySelectorAll("li a ");
+  let a = div.querySelectorAll("li a");
   a.forEach((e) => {
     if (e.href.endsWith(".mp3")) {
       const size = e.parentNode.querySelector(".size").textContent;
@@ -65,7 +64,7 @@ const renderPlayPauseButton = (songLink) => {
   });
 };
 
-const playCurrentMusic = async(audio) => {
+const playCurrentMusic = async (audio) => {
   if (currentAudio) {
     if (currentAudio.src === audio.src) {
       currentAudio.pause();
@@ -86,19 +85,23 @@ const playCurrentMusic = async(audio) => {
     const songList = await getSongs();
 
     const songObj = songList.find((song) => song.link === currentAudio.src);
-    
-    document.querySelector('.playbar .song-info').innerHTML = !!songObj ? `${songObj.title} - ${songObj.artist}` : `Song Name - Aritist Name`;
+
+    document.querySelector(".playbar .song-info").innerHTML = !!songObj
+      ? `${songObj.title} - ${songObj.artist}`
+      : `Song Name - Aritist Name`;
 
     currentAudio.addEventListener("timeupdate", () => {
       if (currentAudio && currentAudio.currentTime && currentAudio.duration) {
         const duration = `${formatDuration(
           currentAudio.currentTime
         )} / ${formatDuration(currentAudio.duration)}`;
-        document.querySelector(".playbar .song-time-volume .song-time").innerHTML = duration;
+        document.querySelector(
+          ".playbar .song-time-volume .song-time"
+        ).innerHTML = duration;
         document.querySelector(".playbar .seekbar .circle").style.left = `${
           (currentAudio.currentTime / currentAudio.duration) * 100
         }%`;
-        
+
         document.querySelector(".over-seekbar").style.width = `${
           (currentAudio.currentTime / currentAudio.duration) * 100
         }%`;
@@ -111,10 +114,15 @@ const playCurrentMusic = async(audio) => {
             currentAudio.currentTime = (currentAudio.duration * percent) / 100;
             document.querySelector(".circle").style.left = `${percent}%`;
           });
-
       } else {
-        document.querySelector(".playbar .song-time-volume .song-time").innerHTML = "0:00 / 0:00";
+        document.querySelector(
+          ".playbar .song-time-volume .song-time"
+        ).innerHTML = "0:00 / 0:00";
       }
+    });
+
+    document.querySelector(".range input").addEventListener("change", (e) => {
+      currentAudio.volume = parseInt(e.target.value) / 100;
     });
   }
   renderPlayPauseButton(currentAudio.src);
