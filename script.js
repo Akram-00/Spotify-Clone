@@ -137,7 +137,7 @@ currentAudio = null;
 let isPlaying = false;
 let statusImg = null;
 let currentFolderUrl = `http://127.0.0.1:5500/songs/tamil_songs`;
-let currentVolume = 1;
+let currentVolume;
 let muteStatus = false;
 
 // currentmusic player
@@ -151,11 +151,11 @@ async function playCurrentMusic(audio) {
       currentAudio.pause();
       // if its not the same song
     } else {
-      currentAudio.pause(); // pause the current audio playing
-      currentAudio = audio; // set the new audio to current audio
-      isPlaying = false; // set the isPlaying to false ( song is pasued )
+      currentAudio.pause(); // pause the current audio playing ( previous song )
+      currentAudio = audio; // set the new audio to current audio ( new song setting to current Audio )
+      isPlaying = false; // set the isPlaying to false ( song is pasued for the song )
     }
-    currentAudio.volume = currentVolume;
+    currentAudio.volume = currentVolume ? currentVolume : 0.5 ; // set currentVolume data
   }
 
   // if the song is not playing then the isPlaying is set to be false
@@ -262,6 +262,7 @@ async function renderSongs() {
 
   // if there are songs in that folder
   if (songs) {
+    songListContainer.innerHTML = ""
     // looping through each object and setting a songElement
     songs.forEach((song) => {
       songListContainer.innerHTML += `
@@ -278,6 +279,8 @@ async function renderSongs() {
         </li>
       `;
     });
+
+    console.log(songs)
 
     // listen event from the songList under the library
     Array.from(document.querySelectorAll(".songlist ol li")).forEach((e) => {
@@ -301,7 +304,7 @@ const main = async () => {
   const folderGrid = document.querySelector("#spotifyPlaylist .card-container");
 
   await renderSongs();
-
+  
   folders.forEach((folder) => {
     const folderTitle = folder.infoJson.title.split("_").join(" ");
     folderGrid.innerHTML += `
