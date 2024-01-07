@@ -9,7 +9,7 @@
 
 :root{
   --a:0;
-  --bottom:24px;
+  --bottom:65px;
 }
 
 .body {
@@ -188,10 +188,10 @@
   width: 20%;
   background: #1fdf64;
   border-radius: 30px;
-  padding: 13px;
+  padding: 10px;
   opacity: var(--a);
   cursor: pointer;
-  transition: all 0.9s;
+  transition: all 0.3s;
 }
 
 .buttons > * {
@@ -364,6 +364,10 @@
   justify-content: center;
   align-items: center;
   gap: 6px;
+}
+
+.aboveBar .song-time-volume .song-volume .range input{
+  cursor: pointer;
 }
 
 /* .song-time-volume .song-volume:hover::before{

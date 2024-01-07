@@ -1,16 +1,43 @@
+// formatting the size
 function convertBytesToMB(bytes) {
   return (bytes / (1024 * 1024)).toFixed(2);
 }
-
+// formatting the duration
 function formatDuration(seconds) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
   return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
 }
 
+// getting the folder files
+async function getFolder() {
+  const folders = [];
+  let folder = await fetch(`http://127.0.0.1:5500/songs/`);
+  let responseText = await folder.text();
+  let parser = new DOMParser();
+  let response = parser.parseFromString(responseText, "text/html");
+  response.querySelectorAll("ul li a").forEach(async (e) => {
+    if (
+      e.href.startsWith("http://127.0.0.1:5500/songs/") &&
+      e.href.endsWith("_songs")
+    ) {
+      const folderObj = {
+        link: e.href,
+      };
+      folders.push(folderObj);
+      const infoJsonLink = await fetch(`${e.href}/info.json`);
+      const response = await infoJsonLink.json();
+      folderObj.infoJson = response;
+    }
+  });
+
+  return folders;
+}
+
+// getting the music files inside a folder
 async function getSongs(folder) {
   const songs = [];
-  let musics = !!folder ? await fetch(`http://127.0.0.1:5500/songs/${folder}`) : await fetch("http://127.0.0.1:5500/songs/");
+  let musics = await fetch(folder);
   let response = await musics.text();
   let div = document.createElement("DIV");
   div.innerHTML = response;
@@ -33,71 +60,132 @@ async function getSongs(folder) {
       songs.push(song);
     }
   });
+
   return songs;
 }
 
-const song_0_link = `http://127.0.0.1:5500/songs/Abroad%20Again%20-%20Jeremy%20Blake.mp3`;
-currentAudio = new Audio(song_0_link);
-let isPlaying = false;
-let statusImg = null;
+// event listner for handling songButtons inside a playBar
+async function handleSongButtons(event) {
+  const eventClass = event.target.classList;
+  const songs = await getSongs(currentFolderUrl);
+  let currentSong, index;
 
-const renderPlayPauseButton = (songLink) => {
-  statusImg = isPlaying === true ? "pause-song.svg" : "play-song.svg";
+  if (!currentAudio) {
+    currentAudio = new Audio(songs[0].link);
+  }
+
+  if (currentAudio) {
+    currentSong = songs.find((song) => song.link === currentAudio.src); // find the song object
+    index = songs.indexOf(currentSong); // get the song Object index
+    // previous song button
+    if (eventClass.contains("previous")) {
+      // if the index is 0 (first song) then go to songs.length - 1 ( last song)
+      // if index is not 0 then set decreemet the index by 1 ( index - 1)
+      const previousIndex = index === 0 ? songs.length - 1 : index - 1;
+      // create new audio and pass it to the previousSong
+      const previousSong = new Audio(songs[previousIndex].link);
+      
+      await playCurrentMusic(previousSong);
+    }
+    // play or pause button
+    else if (eventClass.contains("play-pause")) {
+      // play or pause the currentAudio
+      await playCurrentMusic(currentAudio);
+    }
+    // next song button
+    else if (eventClass.contains("next")) {
+      // if index is last index then set the next index to be 0
+      // if not increement the index by 1 ( index + 1)
+      const nextIndex = index === songs.length - 1 ? 0 : index + 1;
+      // create an new audio and pass the nextSong to the playCurrentMusic
+      const nextSong = new Audio(songs[nextIndex].link);
+      
+      await playCurrentMusic(nextSong);
+    }
+  }
+}
+
+// dynamically displaying the songs play pause feature
+function renderPlayPauseButton(songlink) {
+  // if the isPlaying is true then pause Image or Play Image
+  statusImg = !!isPlaying ? "assets/pause-song.svg" : "assets/play-song.svg";
+  // selecting the currentSong playButton and playbar playbutton
   const playbarBtn = document.querySelector(".songbuttons .play-pause");
-
   const songElements = document.querySelectorAll(".songlist ol li");
 
+  // if there is playbarBtn set the current status Image ( play / pause )
   if (playbarBtn) {
     playbarBtn.src = statusImg;
   }
-
+  // Loop through the songElements
   songElements.forEach((songElement) => {
-    const songElementLink = songElement.getAttribute("songLink");
+    // selecting the song element
+    const songElementLink = songElement.getAttribute("songlink");
     const playNowImg = songElement.querySelector(".playnow img");
-
-    if (songElementLink === songLink) {
+    // if the songelement matches set the status Image to ( play / pause )
+    if (songElementLink === songlink) {
       playNowImg.src = statusImg;
     } else {
       // If it's not the current playing song, set it to the pause icon
-      playNowImg.src = "play-song.svg";
+      playNowImg.src = "assets/play-song.svg";
     }
   });
-};
+}
 
-const playCurrentMusic = async (audio) => {
+// Global variables
+currentAudio = null;
+let isPlaying = false;
+let statusImg = null;
+let currentFolderUrl = `http://127.0.0.1:5500/songs/tamil_songs`;
+let currentVolume = 0.1;
+
+// currentmusic player
+async function playCurrentMusic(audio) {
+  // if the currentAudio is present ( not null )
+
   if (currentAudio) {
+    // if the currentAudio and new Audio src is same
     if (currentAudio.src === audio.src) {
+      // Pause the song
       currentAudio.pause();
+      // if its not the same song
     } else {
-      currentAudio.pause();
-      currentAudio = audio;
-      isPlaying = false;
+      currentAudio.pause(); // pause the current audio playing
+      currentAudio = audio; // set the new audio to current audio
+      isPlaying = false; // set the isPlaying to false ( song is pasued )
     }
+    currentAudio.volume = currentVolume;
   }
-
+  
+  // if the song is not playing then the isPlaying is set to be false
+  //  ( because we've clicked any of the play button )
   if (isPlaying) {
     isPlaying = false;
   } else {
-    audio.play();
-    currentAudio = audio;
-    isPlaying = true;
+    audio.play(); // play the given audio
+    currentAudio = audio; // set the currentAudio to new Audio
+    isPlaying = true; // set the isPlaying to be true
 
-    const songList = await getSongs();
+    const songList = await getSongs(currentFolderUrl); // getting the songs of the currentFolder
 
-    const songObj = songList.find((song) => song.link === currentAudio.src);
+    const songObj = songList.find((song) => song.link === currentAudio.src); //getting the songObject ( clicked )
 
+    // displaying the duration , song-info in the playbar
     document.querySelector(".playbar .song-info").innerHTML = !!songObj
       ? `${songObj.title} - ${songObj.artist}`
       : `Song Name - Aritist Name`;
 
+    // adding a timeupdate Event to make the slibar more dynamic while playing the song
     currentAudio.addEventListener("timeupdate", () => {
       if (currentAudio && currentAudio.currentTime && currentAudio.duration) {
         const duration = `${formatDuration(
           currentAudio.currentTime
         )} / ${formatDuration(currentAudio.duration)}`;
+
         document.querySelector(
           ".playbar .song-time-volume .song-time"
         ).innerHTML = duration;
+        
         document.querySelector(".playbar .seekbar .circle").style.left = `${
           (currentAudio.currentTime / currentAudio.duration) * 100
         }%`;
@@ -121,63 +209,110 @@ const playCurrentMusic = async (audio) => {
       }
     });
 
+    // setting the volume of the song while playing
     document.querySelector(".range input").addEventListener("change", (e) => {
       currentAudio.volume = parseInt(e.target.value) / 100;
+      currentVolume = currentAudio.volume;
     });
   }
+  // check this while using play / pausing the song
+  // console.log(`
+  // CURRENT AUDIO : ${currentAudio.src}
+  //   IS PLAYING : ${isPlaying}
+  //   CURRENTFOLDER : ${currentFolderUrl}
+  //   STATUS IMAGE : ${statusImg}
+  //   CURRENT VOLUME : ${currentAudio.volume}
+
+  // `);
+  // rendering the play Pause button on each time playCurrentMusic is called ( either clicked play / pause )
   renderPlayPauseButton(currentAudio.src);
-};
+}
 
-const main = async () => {
-  let songs = await getSongs();
+// displaying the current folderSongs
+async function renderSongs() {
+  const songListContainer = document.querySelector(".songlist ol");
+  songListContainer.innerHTML = "";
 
-  const songOl = document.querySelector(".songlist ol");
+  // getting the songList array of Objects from the currentFolder ( global variable )
+  let songs = await getSongs(currentFolderUrl);
 
-  songs.forEach((song) => {
-    const audio = new Audio(song.link);
-    songOl.innerHTML += `
-        <li songLink="${song.link}">
-          <img class="invert" src="musical-note_461238.svg" alt="">
+  // if there are songs in that folder
+  if (songs) {
+    // looping through each object and setting a songElement
+    songs.forEach((song) => {
+      songListContainer.innerHTML += `
+        <li songlink="${song.link}">
+          <img class="invert" src="assets/musical-note_461238.svg" alt="">
             <div class="info">
               <div class="song-name" song-name="${song.title}">${song.title}</div>
               <div class="song-artist" song-artist="${song.artist}">${song.artist}</div>
             </div>
             <div class="playnow">
               <span>play now</span>
-              <img src="play-song.svg" class="invert" alt="playnow">
+              <img src="assets/play-song.svg" class="invert" alt="playnow">
             </div>
         </li>
       `;
-  });
-
-  Array.from(document.querySelectorAll(".songlist ol li")).forEach((e) => {
-    e.addEventListener("click", () => {
-      const link = e.getAttribute("songLink");
-      const audio = new Audio(link);
-      playCurrentMusic(audio);
-      renderPlayPauseButton(link);
     });
+
+    // listen event from the songList under the library
+    Array.from(document.querySelectorAll(".songlist ol li")).forEach((e) => {
+      e.addEventListener("click", async () => {
+        const link = e.getAttribute("songlink");
+        const audio = new Audio(link);
+        await playCurrentMusic(audio);
+        renderPlayPauseButton(link);
+      });
+    });
+
+    document
+      .querySelector(".songbuttons")
+      .addEventListener("click", handleSongButtons);
+  }
+}
+
+const main = async () => {
+  let folders = await getFolder();
+
+  const folderGrid = document.querySelector("#spotifyPlaylist .card-container");
+
+  await renderSongs();
+
+  folders.forEach((folder) => {
+    const folderTitle = folder.infoJson.title.split("_").join(" ");
+    folderGrid.innerHTML += `
+            <div class="card rounded js-playlist" folderLink = ${folder.link}>
+              <img
+                class="thumbnail rounded"
+                src="${folder.infoJson.cover}"
+                alt=""
+              />
+              <h3>${folderTitle}</h3>
+              <img src="assets/green-play-btn.svg" alt="" class="green-play-btn js-playlist-play-btn" />
+              <p>${folder.infoJson.description}</p>
+            </div>      
+    `;
   });
 
-  document.querySelector(".songbuttons").addEventListener("click", (event) => {
-    const eventClass = event.target.classList;
-
-    if (eventClass.contains("previous")) {
-      const currentSong = songs.find((song) => song.link === currentAudio.src);
-      const index = songs.indexOf(currentSong);
-      const previousIndex = index === 0 ? songs.length - 1 : index - 1;
-      const nextSong = new Audio(songs[previousIndex].link);
-      playCurrentMusic(nextSong);
-    } else if (eventClass.contains("play-pause")) {
-      playCurrentMusic(currentAudio);
-    } else if (eventClass.contains("next")) {
-      const currentSong = songs.find((song) => song.link === currentAudio.src);
-      const index = songs.indexOf(currentSong);
-      const nextIndex = index < songs.length ? index + 1 : 0;
-      const nextSong = new Audio(songs[nextIndex].link);
-      playCurrentMusic(nextSong);
+  Array.from(document.querySelectorAll(".card-container .js-playlist")).forEach(
+    async (e) => {
+      const link = e.getAttribute("folderLink");
+      e.addEventListener("click", async () => {
+        currentFolderUrl = link;
+        await renderSongs();
+      });
+      e.querySelector(".js-playlist-play-btn").addEventListener(
+        "click",
+        async () => {
+          currentFolderUrl = link;
+          const songs = await getSongs(currentFolderUrl);
+          const firstSong = new Audio(songs[0].link);
+          playCurrentMusic(firstSong);
+          await renderSongs();
+        }
+      );
     }
-  });
+  );
 
   document.querySelector(".hamburger").addEventListener("click", () => {
     document.querySelector(".left").style.left = "0";
