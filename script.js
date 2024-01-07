@@ -84,7 +84,7 @@ async function handleSongButtons(event) {
       const previousIndex = index === 0 ? songs.length - 1 : index - 1;
       // create new audio and pass it to the previousSong
       const previousSong = new Audio(songs[previousIndex].link);
-      
+
       await playCurrentMusic(previousSong);
     }
     // play or pause button
@@ -99,7 +99,7 @@ async function handleSongButtons(event) {
       const nextIndex = index === songs.length - 1 ? 0 : index + 1;
       // create an new audio and pass the nextSong to the playCurrentMusic
       const nextSong = new Audio(songs[nextIndex].link);
-      
+
       await playCurrentMusic(nextSong);
     }
   }
@@ -137,7 +137,8 @@ currentAudio = null;
 let isPlaying = false;
 let statusImg = null;
 let currentFolderUrl = `http://127.0.0.1:5500/songs/tamil_songs`;
-let currentVolume = 0.1;
+let currentVolume = 1;
+let muteStatus = false;
 
 // currentmusic player
 async function playCurrentMusic(audio) {
@@ -156,7 +157,7 @@ async function playCurrentMusic(audio) {
     }
     currentAudio.volume = currentVolume;
   }
-  
+
   // if the song is not playing then the isPlaying is set to be false
   //  ( because we've clicked any of the play button )
   if (isPlaying) {
@@ -185,14 +186,12 @@ async function playCurrentMusic(audio) {
         document.querySelector(
           ".playbar .song-time-volume .song-time"
         ).innerHTML = duration;
-        
-        document.querySelector(".playbar .seekbar .circle").style.left = `${
-          (currentAudio.currentTime / currentAudio.duration) * 100
-        }%`;
 
-        document.querySelector(".over-seekbar").style.width = `${
-          (currentAudio.currentTime / currentAudio.duration) * 100
-        }%`;
+        document.querySelector(".playbar .seekbar .circle").style.left = `${(currentAudio.currentTime / currentAudio.duration) * 100
+          }%`;
+
+        document.querySelector(".over-seekbar").style.width = `${(currentAudio.currentTime / currentAudio.duration) * 100
+          }%`;
 
         document
           .querySelector(".playbar .seekbar")
@@ -209,21 +208,46 @@ async function playCurrentMusic(audio) {
       }
     });
 
+    document.querySelector(".playbar").addEventListener("click", (e) => {
+      const volumeButton = e.target.closest(".song-volume img");
+      if (volumeButton) {
+        muteStatus = !muteStatus;
+        const volumeSlider = document.querySelector('.song-volume .range input')
+        if (volumeButton.src.includes("assets/volume.svg")) {
+          volumeButton.src = volumeButton.src.replace(
+            "assets/volume.svg",
+            "assets/mute.svg"
+          );
+          volumeSlider.value = 0;
+        } else {
+          volumeButton.src = volumeButton.src.replace(
+            "assets/mute.svg",
+            "assets/volume.svg"
+          );
+          volumeSlider.value = 50;
+        }
+        setTimeout(() => {
+          console.log(currentAudio.src, muteStatus);
+        }, 10);
+        currentVolume = currentAudio.volume = muteStatus ? 0 : 0.5;
+        e.stopImmediatePropagation();
+      }
+    });
+
     // setting the volume of the song while playing
     document.querySelector(".range input").addEventListener("change", (e) => {
       currentAudio.volume = parseInt(e.target.value) / 100;
       currentVolume = currentAudio.volume;
+      if (currentAudio.volume === 0) {
+        muteStatus = true;
+        document.querySelector('.song-volume img').src = 'assets/mute.svg'
+      } else if (currentAudio !== 0) {
+        muteStatus = false;
+        document.querySelector(".song-volume img").src ="assets/volume.svg";
+      }
     });
   }
-  // check this while using play / pausing the song
-  // console.log(`
-  // CURRENT AUDIO : ${currentAudio.src}
-  //   IS PLAYING : ${isPlaying}
-  //   CURRENTFOLDER : ${currentFolderUrl}
-  //   STATUS IMAGE : ${statusImg}
-  //   CURRENT VOLUME : ${currentAudio.volume}
 
-  // `);
   // rendering the play Pause button on each time playCurrentMusic is called ( either clicked play / pause )
   renderPlayPauseButton(currentAudio.src);
 }
