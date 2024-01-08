@@ -12,12 +12,14 @@ function formatDuration(seconds) {
 // getting the folder files
 async function getFolder() {
   const folders = [];
-  let folder = await fetch(`Spotify-Clone/songs/`);
+  let folder = await fetch(`/songs/`);
   let responseText = await folder.text();
-  let parser = new DOMParser();
-  let response = parser.parseFromString(responseText, "text/html");
-  response.querySelectorAll("ul li a").forEach(async (e) => {
-    if (e.href.includes("/songs/") && !(e.href.includes('..'))) {
+  let div = document.createElement("DIV");
+  div.innerHTML = responseText;
+  Array.from(div.querySelectorAll("tbody tr td a")).forEach(async (e) => {
+    //
+    if (e.href.endsWith("songs/") && !e.href.includes("..")) {
+      //
       const folderObj = {
         link: e.href,
       };
@@ -36,28 +38,35 @@ async function getSongs(folder) {
   const songs = [];
   let musics = await fetch(folder);
   let response = await musics.text();
-  let div = document.createElement("DIV");
+  let div = document.createElement("DIV"); 
   div.innerHTML = response;
-  let a = div.querySelectorAll("li a");
+
+  const a = Array.from(div.querySelectorAll("table tbody tr td a"));
   a.forEach((e) => {
     if (e.href.endsWith(".mp3")) {
-      const size = e.parentNode.querySelector(".size").textContent;
-      const readableSize = convertBytesToMB(size);
+      const size = e.parentNode.nextElementSibling.textContent;
 
-      const songSrc = e.title.split(".")[0].split("-");
+      const songSrc = e.href
+        .split("songs/")
+        .reverse()[0]
+        .split(".")[0]
+        .split("-")
+        .map((item) => decodeURIComponent(item));
+      
+      const songDuration = new Audio(e.href).duration;
 
       const [songName, artistName] = songSrc;
-
       const song = {
         title: songName,
         artist: artistName,
         link: e.href,
-        size: readableSize,
+        size: size,
+        duration:songDuration,
       };
       songs.push(song);
     }
   });
-
+  console.log(songs)
   return songs;
 }
 
@@ -133,7 +142,7 @@ function renderPlayPauseButton(songlink) {
 currentAudio = null;
 let isPlaying = false;
 let statusImg = null;
-let currentFolderUrl = `/songs/tamil_songs`;
+let currentFolderUrl = `/songs/english_songs`;
 let currentVolume;
 let muteStatus = false;
 
@@ -156,7 +165,7 @@ async function playCurrentMusic(audio) {
     if (muteStatus === true) {
       currentAudio.volume = 0; // mute the audio
     } else if (muteStatus !== true) {
-      currentAudio.volume = currentVolume ? currentVolume : 0.5; // unmute the audio 
+      currentAudio.volume = currentVolume ? currentVolume : 0.5; // unmute the audio
     }
   }
 
@@ -168,19 +177,23 @@ async function playCurrentMusic(audio) {
     audio.play(); // play the given audio
     currentAudio = audio; // set the currentAudio to new Audio
     isPlaying = true; // set the isPlaying to be true
-
     const songList = await getSongs(currentFolderUrl); // getting the songs of the currentFolder
 
     const songObj = songList.find((song) => song.link === currentAudio.src); //getting the songObject ( clicked )
-
     // displaying the duration , song-info in the playbar
     document.querySelector(".playbar .song-info").innerHTML = !!songObj
       ? `${songObj.title} - ${songObj.artist}`
       : `Song Name - Aritist Name`;
 
     // adding a timeupdate Event to make the slibar more dynamic while playing the song
+
     currentAudio.addEventListener("timeupdate", () => {
-      if (currentAudio && currentAudio.currentTime && currentAudio.duration) {
+      if (
+        currentAudio &&
+        currentAudio.currentTime !== undefined &&
+        currentAudio.duration &&
+        currentAudio.duration !== Infinity
+      ) {
         const duration = `${formatDuration(
           currentAudio.currentTime
         )} / ${formatDuration(currentAudio.duration)}`;
@@ -197,14 +210,23 @@ async function playCurrentMusic(audio) {
           (currentAudio.currentTime / currentAudio.duration) * 100
         }%`;
 
-        document
-          .querySelector(".playbar .seekbar")
-          .addEventListener("click", (e) => {
-            let percent =
-              (e.offsetX / e.target.getBoundingClientRect().width) * 100;
-            currentAudio.currentTime = (currentAudio.duration * percent) / 100;
-            document.querySelector(".circle").style.left = `${percent}%`;
-          });
+        // Check if canplay event has already fired before adding click event listener
+        if (!currentAudio.seekbarClickEventAdded) {
+          document
+            .querySelector(".playbar .seekbar")
+            .addEventListener("click", (e) => {
+              if (!currentAudio.paused) {
+                let percent =
+                  (e.offsetX / e.target.getBoundingClientRect().width) * 100;
+                currentAudio.currentTime =
+                  (currentAudio.duration * percent) / 100;
+                document.querySelector(".circle").style.left = `${percent}%`;
+              }
+            });
+
+          // Mark that the click event listener has been added
+          currentAudio.seekbarClickEventAdded = true;
+        }
       } else {
         document.querySelector(
           ".playbar .song-time-volume .song-time"
@@ -233,9 +255,7 @@ async function playCurrentMusic(audio) {
           );
           volumeSlider.value = 50;
         }
-        setTimeout(() => {
-          console.log(currentAudio.src, muteStatus);
-        }, 10);
+        setTimeout(() => {}, 10);
         currentVolume = currentAudio.volume = muteStatus ? 0 : 0.5;
         e.stopImmediatePropagation();
       }
@@ -257,6 +277,14 @@ async function playCurrentMusic(audio) {
 
   // rendering the play Pause button on each time playCurrentMusic is called ( either clicked play / pause )
   renderPlayPauseButton(currentAudio.src);
+  // console.log(`
+  //   currentSong :${currentAudio.src}
+  //   isPlaying : ${isPlaying}
+  //   statusImg : ${statusImg}
+  //   currentFolderUrl : ${currentFolderUrl}
+  //   currentVolume: ${currentAudio.volume}
+  //   muteStatus : ${muteStatus}
+  // `);
 }
 
 // displaying the current folderSongs
@@ -339,18 +367,16 @@ async function renderFolders() {
         async (e) => {
           currentFolderUrl = link;
           const songs = await getSongs(currentFolderUrl);
-          const firstSong = new Audio(songs[0].link);
-          playCurrentMusic(firstSong);
+          await playCurrentMusic(new Audio(songs[0].link));
           await renderSongs();
-          renderPlayPauseButton();
+          renderPlayPauseButton(songs[0].link);
         }
       );
     }
   );
 }
 
-
-// main 
+// main
 const main = async () => {
   await renderFolders();
 };
@@ -365,4 +391,5 @@ document.querySelector(".hamburger").addEventListener("click", () => {
 
 document.querySelector(".close-menu").addEventListener("click", () => {
   leftPage.style.left = "-100%";
-});
+})
+ 
