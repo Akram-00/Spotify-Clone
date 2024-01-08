@@ -155,7 +155,12 @@ async function playCurrentMusic(audio) {
       currentAudio = audio; // set the new audio to current audio ( new song setting to current Audio )
       isPlaying = false; // set the isPlaying to false ( song is pasued for the song )
     }
-    currentAudio.volume = currentVolume ? currentVolume : 0.5 ; // set currentVolume data
+
+    if(muteStatus === true){
+      currentAudio.volume = 0;
+    }else if(muteStatus !== true){
+      currentAudio.volume = currentVolume ? currentVolume : 0.5; 
+    }
   }
 
   // if the song is not playing then the isPlaying is set to be false
