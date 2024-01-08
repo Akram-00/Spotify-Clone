@@ -156,10 +156,10 @@ async function playCurrentMusic(audio) {
       isPlaying = false; // set the isPlaying to false ( song is pasued for the song )
     }
 
-    if(muteStatus === true){
-      currentAudio.volume = 0;
-    }else if(muteStatus !== true){
-      currentAudio.volume = currentVolume ? currentVolume : 0.5; 
+    if (muteStatus === true) {
+      currentAudio.volume = 0; // mute the audio
+    } else if (muteStatus !== true) {
+      currentAudio.volume = currentVolume ? currentVolume : 0.5; // unmute the audio 
     }
   }
 
@@ -192,11 +192,13 @@ async function playCurrentMusic(audio) {
           ".playbar .song-time-volume .song-time"
         ).innerHTML = duration;
 
-        document.querySelector(".playbar .seekbar .circle").style.left = `${(currentAudio.currentTime / currentAudio.duration) * 100
-          }%`;
+        document.querySelector(".playbar .seekbar .circle").style.left = `${
+          (currentAudio.currentTime / currentAudio.duration) * 100
+        }%`;
 
-        document.querySelector(".over-seekbar").style.width = `${(currentAudio.currentTime / currentAudio.duration) * 100
-          }%`;
+        document.querySelector(".over-seekbar").style.width = `${
+          (currentAudio.currentTime / currentAudio.duration) * 100
+        }%`;
 
         document
           .querySelector(".playbar .seekbar")
@@ -217,7 +219,9 @@ async function playCurrentMusic(audio) {
       const volumeButton = e.target.closest(".song-volume img");
       if (volumeButton) {
         muteStatus = !muteStatus;
-        const volumeSlider = document.querySelector('.song-volume .range input')
+        const volumeSlider = document.querySelector(
+          ".song-volume .range input"
+        );
         if (volumeButton.src.includes("assets/volume.svg")) {
           volumeButton.src = volumeButton.src.replace(
             "assets/volume.svg",
@@ -245,10 +249,10 @@ async function playCurrentMusic(audio) {
       currentVolume = currentAudio.volume;
       if (currentAudio.volume === 0) {
         muteStatus = true;
-        document.querySelector('.song-volume img').src = 'assets/mute.svg'
+        document.querySelector(".song-volume img").src = "assets/mute.svg";
       } else if (currentAudio !== 0) {
         muteStatus = false;
-        document.querySelector(".song-volume img").src ="assets/volume.svg";
+        document.querySelector(".song-volume img").src = "assets/volume.svg";
       }
     });
   }
@@ -267,7 +271,7 @@ async function renderSongs() {
 
   // if there are songs in that folder
   if (songs) {
-    songListContainer.innerHTML = ""
+    songListContainer.innerHTML = "";
     // looping through each object and setting a songElement
     songs.forEach((song) => {
       songListContainer.innerHTML += `
@@ -285,7 +289,7 @@ async function renderSongs() {
       `;
     });
 
-    console.log(songs)
+    console.log(songs);
 
     // listen event from the songList under the library
     Array.from(document.querySelectorAll(".songlist ol li")).forEach((e) => {
@@ -303,13 +307,14 @@ async function renderSongs() {
   }
 }
 
-const main = async () => {
+// displaying available folders
+async function renderFolders() {
   let folders = await getFolder();
 
   const folderGrid = document.querySelector("#spotifyPlaylist .card-container");
 
   await renderSongs();
-  
+
   folders.forEach((folder) => {
     const folderTitle = folder.infoJson.title.split("_").join(" ");
     folderGrid.innerHTML += `
@@ -345,14 +350,22 @@ const main = async () => {
       );
     }
   );
+}
 
-  document.querySelector(".hamburger").addEventListener("click", () => {
-    document.querySelector(".left").style.left = "0";
-  });
 
-  document.querySelector(".close-menu").addEventListener("click", () => {
-    document.querySelector(".left").style.left = "-100%";
-  });
+// main 
+const main = async () => {
+  await renderFolders();
 };
 
 main();
+
+var leftPage = document.querySelector(".left");
+
+document.querySelector(".hamburger").addEventListener("click", () => {
+  leftPage.style.left = "0";
+});
+
+document.querySelector(".close-menu").addEventListener("click", () => {
+  leftPage.style.left = "-100%";
+});
