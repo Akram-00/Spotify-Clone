@@ -12,15 +12,12 @@ function formatDuration(seconds) {
 // getting the folder files
 async function getFolder() {
   const folders = [];
-  let folder = await fetch(`http://127.0.0.1:5500/songs/`);
+  let folder = await fetch(`/songs/`);
   let responseText = await folder.text();
   let parser = new DOMParser();
   let response = parser.parseFromString(responseText, "text/html");
   response.querySelectorAll("ul li a").forEach(async (e) => {
-    if (
-      e.href.startsWith("http://127.0.0.1:5500/songs/") &&
-      e.href.endsWith("_songs")
-    ) {
+    if (e.href.includes("/songs/") && !(e.href.includes('..'))) {
       const folderObj = {
         link: e.href,
       };
@@ -136,7 +133,7 @@ function renderPlayPauseButton(songlink) {
 currentAudio = null;
 let isPlaying = false;
 let statusImg = null;
-let currentFolderUrl = `http://127.0.0.1:5500/songs/tamil_songs`;
+let currentFolderUrl = `/songs/tamil_songs`;
 let currentVolume;
 let muteStatus = false;
 
