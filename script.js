@@ -215,6 +215,7 @@ async function playCurrentMusic(audio) {
       }
     });
 
+    // setting mute and unmute button
     document.querySelector(".playbar").addEventListener("click", (e) => {
       const volumeButton = e.target.closest(".song-volume img");
       if (volumeButton) {
@@ -289,8 +290,6 @@ async function renderSongs() {
       `;
     });
 
-    console.log(songs);
-
     // listen event from the songList under the library
     Array.from(document.querySelectorAll(".songlist ol li")).forEach((e) => {
       e.addEventListener("click", async () => {
@@ -340,12 +339,13 @@ async function renderFolders() {
       });
       e.querySelector(".js-playlist-play-btn").addEventListener(
         "click",
-        async () => {
+        async (e) => {
           currentFolderUrl = link;
           const songs = await getSongs(currentFolderUrl);
           const firstSong = new Audio(songs[0].link);
           playCurrentMusic(firstSong);
           await renderSongs();
+          renderPlayPauseButton();
         }
       );
     }

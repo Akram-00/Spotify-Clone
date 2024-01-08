@@ -7,9 +7,12 @@
   font-family: "Roboto", sans-serif;
 }
 
-:root{
-  --a:0;
-  --bottom:65px;
+:root {
+  --a: 0;
+  --bottom: 65px;
+  --scroll-thumb: #121212;
+  --scroll-track: #121212;
+  --opacity: 0;
 }
 
 .body {
@@ -67,7 +70,7 @@
   list-style: none;
   font-weight: 700;
   font-size: 13px;
-  box-shadow: 0px 12px 10px 0px black;
+  box-shadow: -12px 8px 9px -10px black;
 }
 
 .info {
@@ -130,28 +133,29 @@
   padding: 0 10px;
   margin-top: 30px;
   max-height: 71vh;
-  overflow: scroll;
+  overflow-y: scroll;
   transition: overflow 0.3s ease;
   height: fit-content;
 }
 
 .card-container::-webkit-scrollbar {
-  display: none;
+  width: 12px;
 }
 
-/*
+
 .card-container:hover {
-  overflow-y: scroll;
+  --scroll-thumb: rgba(128, 128, 128, 0.596);
+  --scroll-track: #181818;
 }
 
 
  .card-container::-webkit-scrollbar-thumb {
-  background-color: rgba(128, 128, 128, 0.596);
+  background-color: var(--scroll-track);
 }
 
 .card-container::-webkit-scrollbar-track {
-  background-color: #181818;
-} */
+  background-color: var(--scroll-track);
+}
 
 .card {
   width: 200px;
@@ -177,8 +181,8 @@
 
 .card:hover {
   background-color: #242424;
-  --a:1;
-  --bottom:85px
+  --a: 1;
+  --bottom: 85px;
 }
 
 .green-play-btn {
@@ -232,16 +236,12 @@
 .songlist ol {
   padding: 0 20px;
   max-height: 35vh;
-  overflow: scroll;
-}
-
-.songlist ol::-webkit-scrollbar {
-  display: none;
-}
-
-/* 
-.songlist ol:hover {
   overflow-y: scroll;
+}
+
+.songlist ol:hover {
+  --scroll-thumb: rgba(128, 128, 128, 0.596);
+  --scroll-track: #181818;
 }
 
 .songlist ol::-webkit-scrollbar {
@@ -249,12 +249,12 @@
 }
 
 .songlist ol::-webkit-scrollbar-thumb {
-  background-color: rgba(128, 128, 128, 0.596);
+  background-color: var(--scroll-thumb);
 }
 
 .songlist ol::-webkit-scrollbar-track {
-  background-color: #181818;
-} */
+  background-color: var(--scroll-track);
+}
 
 .songlist ol li {
   display: flex;
@@ -366,7 +366,7 @@
   gap: 6px;
 }
 
-.aboveBar .song-time-volume .song-volume .range input{
+.aboveBar .song-time-volume .song-volume .range input {
   cursor: pointer;
 }
 
@@ -404,7 +404,7 @@
 
   .card {
     margin-bottom: 50px;
-    width: calc(100vw - 40%);
+    width:  200px;
     height: fit-content;
   }
 
@@ -419,7 +419,6 @@
   .seekbar {
     width: 95%;
   }
-
 
   .close-menu {
     display: block;
