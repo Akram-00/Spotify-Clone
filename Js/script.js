@@ -12,7 +12,7 @@ function formatDuration(seconds) {
 // getting the folder files
 async function getFolder() {
   const folders = [];
-  let folder = await fetch(`/songs/`);
+  let folder = await fetch(`../songs/`);
   let responseText = await folder.text();
   let parser = new DOMParser();
   let response = parser.parseFromString(responseText, "text/html");
